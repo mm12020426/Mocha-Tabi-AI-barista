@@ -85,6 +85,16 @@
       recommendation: "軽やかで爽やかな風味をお楽しみいただけるため、朝の一杯やリフレッシュしたい時にぴったりです。また、コーヒー通の方にも満足いただける、深い味わいが特徴の逸品です。"
     },
     {
+      id: "colombia-geisha",
+      name: "コロンビア ゲイシャ",
+      type: "焙煎豆",
+      url: "https://shop.mochatabi-coffee.com/items/141224622", // いただいたURLを設定しました！
+      flavors: ["シトラス", "マンダリン", "グレープフルーツ", "フローラル"],
+      description: "この豆は、マンダリンやグレープフルーツを思わせる柑橘系の風味と、ゲイシャ特有のフローラルな香りが特徴のコロンビア産ゲイシャです。浅煎りにすることで、明るく透明感のある酸味と華やかなアロマが際立ちます。口に含むと、シトラスのような爽やかな酸味とともに、みずみずしく上品な甘みが広がります。飲み進めるにつれてフローラルな香りがふわりと立ち上がり、クリーンで心地よい余韻が長く続きます。",
+      features: ["マンダリンやグレープフルーツを思わせる柑橘の風味", "ゲイシャ特有のフローラルな香り", "明るく透明感のある酸味", "クリーンで心地よい余韻"],
+      recommendation: "爽やかなシトラス系の風味と華やかな香りを楽しめるため、コーヒーの香りをゆっくり味わいたい時間にぴったりです。フルーティーでクリーンな味わいは、浅煎りコーヒーがお好きな方やスペシャルティコーヒーの魅力を楽しみたい方におすすめの一杯です。"
+    },
+    {
       id: "colombia-pink-bourbon",
       name: "コロンビア ピンクブルボン",
       type: "焙煎豆",
@@ -153,12 +163,22 @@
       title: "どんな味わいがお好みですか？",
       subtitle: "あなたにぴったりの焙煎豆をお選びします",
       options: [
-        { id: "citrus", icon: "fa-lemon-o", title: "軽やかで柑橘系", description: "レモンのような爽やかな酸味、ゲイシャ特有の華やかな香り", value: "citrus", productId: "panama-geisha" },
+        { id: "citrus", icon: "fa-lemon-o", title: "軽やかで柑橘系", description: "爽やかな酸味とゲイシャ特有の華やかな香り", value: "citrus" },
         { id: "berry-chocolate", icon: "fa-heart", title: "ベリーとチョコの調和", description: "ラズベリーの甘酸っぱさとチョコレートのコク深い味わい", value: "berry-chocolate", productId: "colombia-pink-bourbon" },
         { id: "peach", icon: "fa-leaf", title: "ピーチの芳醇な香り", description: "完熟ピーチの華やかさとブランデーのような重厚な甘み", value: "peach", productId: "yunnan-puerh-peach" },
         { id: "lychee", icon: "fa-star", title: "ライチの個性的な味わい", description: "未体験の香味、ジュースのようにジューシーで強烈なフレーバー", value: "lychee", productId: "colombia-el-paraiso-lychee" }
       ],
       condition: function (answers) { return answers[0] === "beans"; }
+    },
+    {
+      id: 3,
+      title: "柑橘系の風味の中で、どちらのニュアンスがお好みですか？",
+      subtitle: "2つの特別なゲイシャからお選びください",
+      options: [
+        { id: "lemon-honey", icon: "fa-sun-o", title: "レモンとハチミツの甘み", description: "透き通るような甘みと花のような香り（パナマ産）", value: "lemon", productId: "panama-geisha" },
+        { id: "grapefruit-mandarin", icon: "fa-tint", title: "グレープフルーツのみずみずしさ", description: "明るく透明感のある酸味と上品な甘み（コロンビア産）", value: "grapefruit", productId: "colombia-geisha" }
+      ],
+      condition: function (answers) { return answers[0] === "beans" && answers[1] === "citrus"; }
     }
   ];
 
@@ -229,14 +249,12 @@
         return;
       }
 
-      // 質問リストを更新（最初の質問の後）
-      if (currentQ === 0) {
-        activeQuestions = [QUESTIONS[0]];
-        for (var i = 1; i < QUESTIONS.length; i++) {
-          var q = QUESTIONS[i];
-          if (!q.condition || q.condition(answers)) {
-            activeQuestions.push(q);
-          }
+      // 回答が進むたびに質問リストを動的に更新
+      activeQuestions = [QUESTIONS[0]];
+      for (var i = 1; i < QUESTIONS.length; i++) {
+        var q = QUESTIONS[i];
+        if (!q.condition || q.condition(answers)) {
+          activeQuestions.push(q);
         }
       }
 
@@ -298,6 +316,14 @@
       if (currentQ > 0) {
         currentQ--;
         answers.pop();
+        // 戻る時も質問リストを再計算
+        activeQuestions = [QUESTIONS[0]];
+        for (var i = 1; i < QUESTIONS.length; i++) {
+          var q = QUESTIONS[i];
+          if (!q.condition || q.condition(answers)) {
+            activeQuestions.push(q);
+          }
+        }
         showQuestion();
       }
     });
